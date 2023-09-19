@@ -3,13 +3,23 @@ from dash import dcc
 from dash import html
 import plotly.express as px
 import pandas as pd
+import requests
+from io import StringIO
 
-# Crear un DataFrame de ejemplo
-data = {
-    'x': [1, 2, 3, 4, 5],
-    'y': [10, 11, 12, 13, 14]
-}
-df = pd.DataFrame(data)
+# URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
+url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/mi_archivo.csv'
+
+# Hacer una solicitud HTTP para obtener el contenido del archivo CSV
+response = requests.get(url_csv_raw)
+print(response.text)
+
+# Verificar si la solicitud fue exitosa
+if response.status_code == 200:
+    # Leer el contenido del archivo CSV en un DataFrame
+    df = pd.read_csv(StringIO(response.text))
+    print(df)
+else:
+    print("No se pudo obtener el archivo CSV")
 
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
