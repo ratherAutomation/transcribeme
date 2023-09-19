@@ -55,7 +55,7 @@
     "])\n",
     "\n",
     "if __name__ == '__main__':\n",
-    "    app.run_server(debug=True, port=8051)\n"
+    "    app.run_server(debug=True)\n"
    ]
   },
   {
