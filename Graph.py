@@ -1,6 +1,8 @@
 import dash
 from dash import dcc
 from dash import html
+from dash import Input
+from dash import Output
 import plotly.express as px
 import pandas as pd
 import requests
@@ -27,11 +29,27 @@ server = app.server
 # Definir el diseño de la aplicación
 app.layout = html.Div([
     html.H1("TranscribeMe Dashboard"),
-    dcc.Graph(
-        id='grafico-prueba',
-        figure=px.scatter(df, x='Date', y='ActiveUsers', title='Active Users by Date')
-    )
+    
+    # Dropdown para seleccionar país
+    dcc.Dropdown(
+        id='country-dropdown',
+        options=[{'label': country, 'value': country} for country in df['Country'].unique()],
+        value=df['Country'].unique()[0]  # Valor predeterminado
+    ),
+    
+    # Gráfico de barras
+    dcc.Graph(id='bar-chart')
 ])
+
+# Callback para actualizar el gráfico de barras según el país seleccionado
+@app.callback(
+    Output('bar-chart', 'figure'),
+    Input('country-dropdown', 'value')
+)
+def update_bar_chart(selected_country):
+    filtered_df = df[df['Country'] == selected_country]
+    fig = px.bar(filtered_df, x='Date', y='ActiveUsers', title=f'Usuarios Activos por Fecha en {selected_country}')
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
