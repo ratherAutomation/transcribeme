@@ -7,6 +7,7 @@ import plotly.express as px
 import pandas as pd
 import requests
 from io import StringIO
+import plotly.graph_objects as go
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
 url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subs_sixty.csv'
