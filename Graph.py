@@ -13,13 +13,10 @@ url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/m
 
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
-print(response.text)
-
 # Verificar si la solicitud fue exitosa
 if response.status_code == 200:
     # Leer el contenido del archivo CSV en un DataFrame
-    df = pd.read_csv(StringIO(response.text))
-    print(df)
+    recent_subs = pd.read_csv(StringIO(response.text))
 else:
     print("No se pudo obtener el archivo CSV")
 
