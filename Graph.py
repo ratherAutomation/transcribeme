@@ -9,7 +9,7 @@ import requests
 from io import StringIO
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subsixty.csv'
+url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subs_sixty.csv'
 
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
