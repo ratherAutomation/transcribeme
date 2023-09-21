@@ -24,6 +24,7 @@ else:
 app = dash.Dash(__name__)
 server = app.server
 
+
 # Definir las opciones para el filtro desplegable de países
 opciones_paises = [{'label': pais, 'value': pais} for pais in recent_subs['Country'].unique()]
 
@@ -50,7 +51,7 @@ def actualizar_grafico(pais_seleccionado):
     # Crear el gráfico de barras
     fig = px.bar(df_filtrado, x='date', y='new_subscribers', title=f'Nuevos Subscriptores por Fecha en {pais_seleccionado}')
 
-    # Agregar una línea vertical en la fecha 2023-09-13
+    # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
     fig.add_shape(
         go.layout.Shape(
@@ -59,9 +60,11 @@ def actualizar_grafico(pais_seleccionado):
             x1=fecha_cambio,
             y0=0,
             y1=max(df_filtrado['new_subscribers']),
-            line=dict(color="black", width=4,dash='dash'),
+            line=dict(color="grey", width=2, dash='dash'),
         )
     )
+
+    # Agregar un título a la línea vertical
     fig.add_annotation(
         go.layout.Annotation(
             text="3 days free trial",
@@ -73,6 +76,7 @@ def actualizar_grafico(pais_seleccionado):
             ay=-30
         )
     )
+
     # Personalizar el diseño del gráfico
     fig.update_layout(
         xaxis_title='Fecha',
