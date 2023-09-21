@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
 url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subs_sixty.csv'
+url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/dau_subs.csv'
 
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
@@ -20,6 +21,15 @@ if response.status_code == 200:
     recent_subs = pd.read_csv(StringIO(response.text))
 else:
     print("No se pudo obtener el archivo CSV")
+# Hacer una solicitud HTTP para obtener el contenido del archivo CSV
+response_two = requests.get(url_csv_dau_sub)
+# Verificar si la solicitud fue exitosa
+if response_two.status_code == 200:
+    # Leer el contenido del archivo CSV en un DataFrame
+    merged_df = pd.read_csv(StringIO(response_two.text))
+else:
+    print("No se pudo obtener el archivo CSV")
+
 
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
@@ -86,6 +96,21 @@ def actualizar_grafico(pais_seleccionado):
     )
 
     return fig
+
+def figura_grafico_dispersion():
+    # ... Código para el segundo gráfico de dispersión (estático) ...
+    fig = px.scatter(
+        merged_df,
+        x='dau',
+        y='new_subscribers',
+        color='Country',
+        title='Gráfico de Dispersión Dau vs. New Subscribers por País',
+        labels={'dau': 'DAU', 'new_subscribers': 'New Subscribers'}
+    )
+    return fig
+
+app.layout.children.append(html.Div(dcc.Graph(id='grafico-dispersion', figure=figura_grafico_dispersion())))
+
 
 # Ejecutar la aplicación
 
