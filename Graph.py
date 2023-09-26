@@ -55,10 +55,15 @@ def figura_grafico_dispersion():
     fig.update_traces(showlegend=False)
 
     return fig
-
+columnas_personalizadas = [
+    {'name': 'Country', 'id': 'country'},
+    {'name': 'Average DAU', 'id': 'average_dau'},
+    {'name': 'Sub', 'id': 'total_subs'},
+    {'name': 'Ratio', 'id': 'ratio'}
+]
 tabla_de_datos = dash_table.DataTable(
     id='tabla-de-datos',
-    columns=[{'name': col, 'id': col} for col in ratio_df.columns],
+    columns=columnas_personalizadas,
     data=ratio_df.to_dict('records'),
     fixed_rows={'headers': True},
     
