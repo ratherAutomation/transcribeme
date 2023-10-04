@@ -25,9 +25,7 @@ else:
     print("No se pudo obtener el archivo CSV")
 
 response_two = requests.get(url_csv_dau_sub)
-# Verificar si la solicitud fue exitosa
 if response_two.status_code == 200:
-    # Leer el contenido del archivo CSV en un DataFrame
     ratio_df = pd.read_csv(StringIO(response_two.text))
 else:
     print("No se pudo obtener el archivo CSV")
@@ -106,8 +104,7 @@ app.layout = html.Div([
             tabla_de_datos
         ], style={'width': '40%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
     ], style={'width': '100%', 'display': 'flex'}),  # Ajusta el ancho según tus necesidades
-])
-#0000000
+]),
     html.Div([
         html.H1("balance"),
         dcc.Dropdown(
@@ -118,10 +115,10 @@ app.layout = html.Div([
         dcc.Graph(id='graph')
     ])
     
-    @app.callback(
-        Output('graph', 'figure'),
-        Input('country-filter', 'value')
-    )
+@app.callback(
+    Output('graph', 'figure'),
+    Input('country-filter', 'value')
+)
 def update_graph(selected_country):
     filtered_df = income_expenses_balance[income_expenses_balance['country'] == selected_country]
     fig = px.scatter(
@@ -178,7 +175,6 @@ def actualizar_grafico(pais_seleccionado):
         )
     )
     
-        # Agregar un título a la línea vertical
     fig.add_annotation(
         go.layout.Annotation(
         text="3 days free trial",
@@ -199,7 +195,6 @@ def actualizar_grafico(pais_seleccionado):
     )
     
     return fig
-
 
 # Ejecutar la aplicación
 
