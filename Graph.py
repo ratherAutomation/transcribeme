@@ -85,8 +85,6 @@ tabla_de_datos = dash_table.DataTable(
     style_table={'height': '350px', 'overflowY': 'auto','padding-top': '50px'}  # Limitar la altura de la tabla y agregar scroll
 )
 
-
-
 app.layout = html.Div([
     # División principal con dos partes: gráfico central y división de dos columnas
     html.Div([# Gráfico central (puedes personalizar esto)
