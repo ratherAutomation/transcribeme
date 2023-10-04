@@ -14,6 +14,7 @@ import plotly.graph_objects as go
 url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subs_sixty.csv'
 url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/ratio_df.csv'
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
+url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
@@ -37,6 +38,13 @@ if response_three.status_code == 200:
 else:
     print("No se pudo obtener el archivo CSV")
 
+response_allcost = requests.get(url_csv_balance)
+if response_allcost.status_code == 200:
+    # Leer el contenido del archivo CSV en un DataFrame
+    all_costs = pd.read_csv(StringIO(response_allcost.text))
+else:
+    print("No se pudo obtener el archivo CSV")
+    
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
 server = app.server
@@ -83,11 +91,11 @@ app.layout = html.Div([
     # División principal con dos partes: gráfico central y división de dos columnas
     html.Div([# Gráfico central (puedes personalizar esto)
         dcc.Dropdown(
-        id='filtro-pais',
-        options=opciones_paises,
-        value='Argentina',  # País seleccionado por defecto
-        multi=False
-    ),
+            id='filtro-pais',
+            options=opciones_paises,
+            value='Argentina',  # País seleccionado por defecto
+            multi=False
+        ),
         dcc.Graph(id='grafico-nuevos-subscriptores')
     ], style={'width': '100%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
 
@@ -115,8 +123,7 @@ app.layout = html.Div([
         ),
         dcc.Graph(id='graph')
     ], style={'width': '100%', 'display': 'inline-block'})
-]),
-    
+])   
     
 @app.callback(
     Output('graph', 'figure'),
