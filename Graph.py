@@ -60,6 +60,7 @@ def figura_grafico_dispersion():
     fig.update_traces(showlegend=False)
 
     return fig
+    
 columnas_personalizadas = [
     {'name': 'Country', 'id': 'country'},
     {'name': 'Average DAU', 'id': 'average_dau'},
