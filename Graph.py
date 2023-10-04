@@ -11,7 +11,7 @@ from io import StringIO
 import plotly.graph_objects as go
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/subs_sixty.csv'
+url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/recent_subs.csv'
 url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/ratio_df.csv'
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
