@@ -105,7 +105,7 @@ app.layout = html.Div([
             tabla_de_datos
         ], style={'width': '40%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
     ], style={'width': '100%', 'display': 'flex'}),  # Ajusta el ancho según tus necesidades
-]),
+   
     html.Div([
         html.H1("balance"),
         dcc.Dropdown(
@@ -114,7 +114,9 @@ app.layout = html.Div([
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph')
-    ])
+    ], style={'width': '100%', 'display': 'inline-block'})
+]),
+    
     
 @app.callback(
     Output('graph', 'figure'),
@@ -144,14 +146,13 @@ def update_graph(selected_country):
     )
             
     max_axis_val = max([filtered_df['cost'].max(),filtered_df['expected_average_income'].max()])*1.1
-        
     fig.update_xaxes(range=[0, max_axis_val]) #filtered_df['cost'].min()
     fig.update_yaxes(range=[0, max_axis_val]) #filtered_df['expected_average_income'].min()
     
     return fig
         
     
-    # Definir la función de actualización del gráfico
+# Definir la función de actualización del gráfico
 @app.callback(
     dash.dependencies.Output('grafico-nuevos-subscriptores', 'figure'),
     [dash.dependencies.Input('filtro-pais', 'value')]
@@ -160,35 +161,35 @@ def actualizar_grafico(pais_seleccionado):
     # Filtrar los datos por el país seleccionado
     df_filtrado = recent_subs[recent_subs['country'] == pais_seleccionado]
     
-        # Crear el gráfico de barras
+    # Crear el gráfico de barras
     fig = px.bar(df_filtrado, x='date', y='new_subs', title=f'Nuevos Subscriptores por Fecha en {pais_seleccionado}')
     
-        # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
+    # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
     fig.add_shape(
         go.layout.Shape(
-        type="line",
-        x0=fecha_cambio,
-        x1=fecha_cambio,  
-        y0=0,
-        y1=max(df_filtrado['new_subs']),
-        line=dict(color="grey", width=2, dash='dash'),
+            type="line",
+            x0=fecha_cambio,
+            x1=fecha_cambio,  
+            y0=0,
+            y1=max(df_filtrado['new_subs']),
+            line=dict(color="grey", width=2, dash='dash'),
         )
     )
     
     fig.add_annotation(
         go.layout.Annotation(
-        text="3 days free trial",
-        x=fecha_cambio,
-        y=max(df_filtrado['new_subs']),
-        showarrow=True,
-        arrowhead=1,
-        ax=-50,
-        ay=-30
+            text="3 days free trial",
+            x=fecha_cambio,
+            y=max(df_filtrado['new_subs']),
+            showarrow=True,
+            arrowhead=1,
+            ax=-50,
+            ay=-30
         )
     )
     
-        # Personalizar el diseño del gráfico
+    # Personalizar el diseño del gráfico
     fig.update_layout(
         xaxis_title='Fecha',
         yaxis_title='Nuevos Subscriptores',
@@ -198,6 +199,5 @@ def actualizar_grafico(pais_seleccionado):
     return fig
 
 # Ejecutar la aplicación
-
 if __name__ == '__main__':
     app.run_server(debug=True)
