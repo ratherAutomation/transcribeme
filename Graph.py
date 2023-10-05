@@ -20,8 +20,28 @@ url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribe
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
-username = secrets.username
-password = secrets.password
+secret_file_path = '/etc/secrets/username'
+
+# Verifica si el archivo existe
+if os.path.exists(secret_file_path):
+    # Abre y lee el contenido del archivo
+    with open(secret_file_path, 'r') as file:
+        username = file.read()
+else:
+    print("El secret file no existe o no se pudo leer.")
+
+secret_file_path = '/etc/secrets/password'
+
+# Verifica si el archivo existe
+if os.path.exists(secret_file_path):
+    # Abre y lee el contenido del archivo
+    with open(secret_file_path, 'r') as file:
+        password = file.read()
+
+# Si el archivo no existe o no se pudo leer, maneja la situación de acuerdo a tus necesidades
+else:
+    print("El secret file no existe o no se pudo leer.")
+
 
 uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
 
