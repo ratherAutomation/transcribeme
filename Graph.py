@@ -58,6 +58,9 @@ collection = db['Income']
 data_from_mongodb = collection.find()
 df_income = pd.DataFrame(data_from_mongodb)
 
+expenses_collection = db['Expenses']
+expenses_data_from_mongo = expenses_collection.find()
+expenses = pd.DataFrame(expenses_data_from_mongo)
 
                   
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
@@ -174,9 +177,45 @@ app.layout = html.Div([
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph')
+    ], style={'width': '100%', 'display': 'inline-block'}),
+    html.Div([
+        html.H1("Gráfico de Datos por País"),
+        dcc.Dropdown(
+            id='country-filter',
+            options=[{'label': country, 'value': country} for country in expenses['country'].unique()],
+            value=expenses['country'].unique()[0]  # Valor predeterminado
+        ),
+        dcc.Graph(id='graph3')
     ], style={'width': '100%', 'display': 'inline-block'})
 ])   
+
+@app.callback(
+    Output('graph3', 'figure'),
+    Input('country-filter', 'value')
+)
+def update_graph_2(selected_country):
+    filtered_df = expenses[expenses['country'] == selected_country]
+    filtered_income_df = df_income[df_income['country'] == selected_country]
+    fig = px.bar(
+        filtered_df,
+        x='date',
+        y='cost',
+        color='cost_type',
+        title=f'associeted costs and expected revenue for: {selected_country}',
+        labels={'Service': 'Valor del Servicio'},
+    )
+    fig.add_trace(go.Scatter(
+        x=filtered_income_df['date'],
+        y=filtered_income_df['expected_average_income'],
+        mode='lines',
+        name='daily_expected_income',
+        line=dict(color='green'),  # Personaliza el color de la línea
+    ))
+
     
+    return fig
+
+
 @app.callback(
     Output('graph', 'figure'),
     Input('country-filter', 'value')
