@@ -7,8 +7,11 @@ from dash import dash_table
 import plotly.express as px
 import pandas as pd
 import requests
+import os
 from io import StringIO
 import plotly.graph_objects as go
+
+from pymongo import MongoClient
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
 url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/recent_subs.csv'
@@ -16,6 +19,25 @@ url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribe
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
+user=os.environ.get('user')
+password =os.environ.get('password')
+uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+db = client['TranscribeMe-charts']  # Reemplaza 'nombre_de_tu_base_de_datos' con el nombre de tu base de datos
+collection = db['Income']
+data_from_mongodb = list(collection.find())
+# Paso 4: Convierte los datos en un DataFrame
+income = income.DataFrame(data_from_mongodb)
+
+
+                  
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
 # Verificar si la solicitud fue exitosa
@@ -85,6 +107,16 @@ tabla_de_datos = dash_table.DataTable(
     style_table={'height': '350px', 'overflowY': 'auto','padding-top': '50px'}  # Limitar la altura de la tabla y agregar scroll
 )
 
+tabla_de_income = dash_table.DataTable(
+        id='tabla-de-income',
+        columns=[
+            {"name": col, "id": col} for col in df_income.columns
+        ],
+        data=df_income.to_dict('records'),
+        style_cell={'minWidth': 60, 'maxWidth': 100},
+        style_table={'height': '300px', 'overflowY': 'auto'},
+)
+
 app.layout = html.Div([
     # División principal con dos partes: gráfico central y división de dos columnas
     html.Div([# Gráfico central (puedes personalizar esto)
@@ -120,7 +152,11 @@ app.layout = html.Div([
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph')
-    ], style={'width': '100%', 'display': 'inline-block'})
+    ], style={'width': '100%', 'display': 'inline-block'}),
+    html.Div([
+        html.H3('income by country'),
+            tabla_de_income
+        ], style={'width': '100%', 'display': 'inline-block'})
 ])   
     
 @app.callback(
