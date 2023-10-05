@@ -23,7 +23,7 @@ username=os.environ.get('user')
 password =os.environ.get('password')
 uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
+client = MongoClient(uri)
 # Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
