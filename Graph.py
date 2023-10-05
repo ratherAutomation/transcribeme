@@ -57,8 +57,7 @@ except Exception as e:
     print(e)
 db = client['TranscribeMe-charts']  # Reemplaza 'nombre_de_tu_base_de_datos' con el nombre de tu base de datos
 collection = db['Income']
-data_from_mongodb = list(collection.find())
-# Paso 4: Convierte los datos en un DataFrame
+data_from_mongodb = collection.find()
 df_income = pd.DataFrame(data_from_mongodb)
 
 
