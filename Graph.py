@@ -19,7 +19,7 @@ url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribe
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
-user=os.environ.get('user')
+username=os.environ.get('user')
 password =os.environ.get('password')
 uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
