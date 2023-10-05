@@ -59,7 +59,7 @@ db = client['TranscribeMe-charts']  # Reemplaza 'nombre_de_tu_base_de_datos' con
 collection = db['Income']
 data_from_mongodb = list(collection.find())
 # Paso 4: Convierte los datos en un DataFrame
-income = pd.DataFrame(data_from_mongodb)
+df_income = pd.DataFrame(data_from_mongodb)
 
 
                   
