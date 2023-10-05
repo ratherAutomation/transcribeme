@@ -11,6 +11,7 @@ import os
 from io import StringIO
 import plotly.graph_objects as go
 
+import secrets
 from pymongo import MongoClient
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
@@ -19,8 +20,8 @@ url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribe
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
-username=os.environ.get('user')
-password =os.environ.get('password')
+username = secrets.get('username')
+password = secrets.get('password')
 uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
 
 print(uri)
