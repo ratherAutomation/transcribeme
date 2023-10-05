@@ -177,11 +177,7 @@ app.layout = html.Div([
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph')
-    ], style={'width': '100%', 'display': 'inline-block'}),
-    html.Div([
-        html.H3('income by country'),
-            tabla_de_income
-        ], style={'width': '100%', 'display': 'inline-block'})
+    ], style={'width': '100%', 'display': 'inline-block'})
 ])   
     
 @app.callback(
