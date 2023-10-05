@@ -181,7 +181,7 @@ app.layout = html.Div([
     html.Div([
         html.H1("Gráfico de Datos por País"),
         dcc.Dropdown(
-            id='country-filter',
+            id='country-filter_2',
             options=[{'label': country, 'value': country} for country in expenses['country'].unique()],
             value=expenses['country'].unique()[0]  # Valor predeterminado
         ),
@@ -191,7 +191,7 @@ app.layout = html.Div([
 
 @app.callback(
     Output('graph3', 'figure'),
-    Input('country-filter', 'value')
+    Input('country-filter_2', 'value')
 )
 def update_graph_2(selected_country):
     filtered_df = expenses[expenses['country'] == selected_country]
@@ -211,8 +211,6 @@ def update_graph_2(selected_country):
         name='daily_expected_income',
         line=dict(color='green'),  # Personaliza el color de la línea
     ))
-
-    
     return fig
 
 
