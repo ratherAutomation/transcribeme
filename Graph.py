@@ -20,8 +20,9 @@ url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribe
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
-username = secrets.get('username')
-password = secrets.get('password')
+username = secrets.username
+password = secrets.password
+
 uri = f"mongodb+srv://{username}:{password}@transcribeme.rletx0y.mongodb.net/?retryWrites=true&w=majority"
 
 print(uri)
