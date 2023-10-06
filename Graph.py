@@ -57,6 +57,7 @@ db = client['TranscribeMe-charts']  # Reemplaza 'nombre_de_tu_base_de_datos' con
 collection = db['Income']
 data_from_mongodb = collection.find()
 df_income = pd.DataFrame(data_from_mongodb)
+df_income = df_income.sort_values(by='date',ascending=True)
 
 expenses_collection = db['Expenses']
 expenses_data_from_mongo = expenses_collection.find()
