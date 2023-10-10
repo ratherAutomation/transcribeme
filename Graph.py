@@ -63,7 +63,12 @@ expenses_collection = db['Expenses']
 expenses_data_from_mongo = expenses_collection.find()
 expenses = pd.DataFrame(expenses_data_from_mongo)
 
-                  
+#subs by country
+subs_by_country_collection = db['subs-by-country']
+subs_by_country_from_mongo=subs_by_country_collection.find()
+subs_by_country_df = pd.DataFrame(subs_by_country_from_mongo)
+
+
 # Hacer una solicitud HTTP para obtener el contenido del archivo CSV
 response = requests.get(url_csv_raw)
 # Verificar si la solicitud fue exitosa
@@ -99,7 +104,7 @@ server = app.server
 
 
 # Definir las opciones para el filtro desplegable de países
-opciones_paises = [{'label': pais, 'value': pais} for pais in recent_subs['country'].unique()]
+opciones_paises = [{'label': country, 'value': country} for pais in subs_by_country_df['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
 
@@ -256,10 +261,10 @@ def update_graph(selected_country):
 )
 def actualizar_grafico(pais_seleccionado):
     # Filtrar los datos por el país seleccionado
-    df_filtrado = recent_subs[recent_subs['country'] == pais_seleccionado]
+    df_filtrado = subs_by_country_df[subs_by_country_df['country'] == pais_seleccionado]
     
     # Crear el gráfico de barras
-    fig = px.bar(df_filtrado, x='date', y='new_subs', title=f'Nuevos Subscriptores por Fecha en {pais_seleccionado}')
+    fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs by date in {pais_seleccionado}')
     
     # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
@@ -269,7 +274,7 @@ def actualizar_grafico(pais_seleccionado):
             x0=fecha_cambio,
             x1=fecha_cambio,  
             y0=0,
-            y1=max(df_filtrado['new_subs']),
+            y1=max(df_filtrado['user_id']),
             line=dict(color="grey", width=2, dash='dash'),
         )
     )
@@ -278,7 +283,7 @@ def actualizar_grafico(pais_seleccionado):
         go.layout.Annotation(
             text="3 days free trial",
             x=fecha_cambio,
-            y=max(df_filtrado['new_subs']),
+            y=max(df_filtrado['user_id']),
             showarrow=True,
             arrowhead=1,
             ax=-50,
@@ -288,8 +293,8 @@ def actualizar_grafico(pais_seleccionado):
     
     # Personalizar el diseño del gráfico
     fig.update_layout(
-        xaxis_title='Fecha',
-        yaxis_title='Nuevos Subscriptores',
+        xaxis_title='Date',
+        yaxis_title='New Subscribers',
         showlegend=False  # Para ocultar la leyenda si no se necesita
     )
     
