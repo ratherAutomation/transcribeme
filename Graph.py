@@ -71,7 +71,7 @@ ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().rese
 ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
 ratio_df['subscribers'].fillna(0, inplace=True)
 ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
-ratio_df['dau'] = ratio_df.round(1)
+ratio_df = ratio_df.round(1)
     
 response_three = requests.get(url_csv_balance)
 if response_three.status_code == 200:
@@ -93,7 +93,7 @@ server = app.server
 
 
 # Definir las opciones para el filtro desplegable de países
-opciones_paises = [{'label': country, 'value': country} for country in subs_by_country_df['country'].unique()]
+country_optioins = [{'label': country, 'value': country} for country in subs_by_country_df['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
 
@@ -171,14 +171,14 @@ app.layout = html.Div([
     # División principal con dos partes: gráfico central y división de dos columnas
     html.Div([# Gráfico central (puedes personalizar esto)
         dcc.Dropdown(
-            id='filtro-pais',
-            options=opciones_paises,
+            id='country-filter',
+            options=country_optioins,
             value='Argentina',  # País seleccionado por defecto
             multi=False
         ),
-        dcc.Graph(id='grafico-nuevos-subscriptores'),
+        dcc.Graph(id='new-subs-by-country'),
         dcc.Graph(id='dau-by-country')
-    ], style={'width': '100%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+    ], style={'width': '90%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
 
     # División de dos columnas (para futuros gráficos)
     html.Div([
@@ -216,69 +216,9 @@ app.layout = html.Div([
 ])   
 
 @app.callback(
-    Output('graph3', 'figure'),
-    Input('country-filter_2', 'value')
-)
-def update_graph_2(selected_country):
-    filtered_df = expenses[expenses['country'] == selected_country]
-    filtered_income_df = df_income[df_income['country'] == selected_country]
-    fig = px.bar(
-        filtered_df,
-        x='date',
-        y='cost',
-        color='cost_type',
-        title=f'associeted costs and expected revenue for: {selected_country}',
-        labels={'Service': 'Valor del Servicio'},
-    )
-    fig.add_trace(go.Scatter(
-        x=filtered_income_df['date'],
-        y=filtered_income_df['expected_average_income'],
-        mode='lines',
-        name='daily_expected_income',
-        line=dict(color='green'),  # Personaliza el color de la línea
-    ))
-    return fig
-
-
-@app.callback(
-    Output('graph', 'figure'),
-    Input('country-filter', 'value')
-)
-def update_graph(selected_country):
-    filtered_df = income_expenses_balance[income_expenses_balance['country'] == selected_country]
-    fig = px.scatter(
-        filtered_df,
-        x='cost',
-        y='expected_average_income',
-        title=f'associeted costs and expected revenue for: {selected_country}'
-    ) 
-    
-    fig.update_traces(
-        text=filtered_df['labels'],
-        hovertemplate='<b>Date</b>: %{text}<br><b>Cost</b>: %{x}<br><b>Expected Avg Income</b>: %{y}',  # Posición y tamaño de las etiquetas
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=income_expenses_balance['cost'],  # Puedes ajustar estos valores según tu necesidad
-            y=1 * income_expenses_balance['cost'],  # Pendiente de 0.05
-            mode='lines',
-            name='y = x',  # Nombre de la recta en la leyenda
-            line=dict(color='black', dash='dash')  # Personalizar el estilo de la línea
-        )
-    )
-            
-    max_axis_val = max([filtered_df['cost'].max(),filtered_df['expected_average_income'].max()])*1.1
-    fig.update_xaxes(range=[0, max_axis_val]) #filtered_df['cost'].min()
-    fig.update_yaxes(range=[0, max_axis_val]) #filtered_df['expected_average_income'].min()
-    
-    return fig
-        
-    
-# Definir la función de actualización del gráfico
-@app.callback(
-    dash.dependencies.Output('grafico-nuevos-subscriptores', 'figure'),
+    dash.dependencies.Output('new-subs-by-country', 'figure'),
     dash.dependencies.Output('dau-by-country','figure'),
-    [dash.dependencies.Input('filtro-pais', 'value')]
+    [dash.dependencies.Input('country-filter', 'value')]
 )
 def actualizar_grafico(selected_country):
     # Filtrar los datos por el país seleccionado
@@ -358,9 +298,68 @@ def actualizar_grafico(selected_country):
             linewidth=1  # Ancho de la línea del eje y (delgado)
         )
     )  
-    
     return fig,dau_by_country_fig
 
+
+
+@app.callback(
+    Output('graph3', 'figure'),
+    Input('country-filter_2', 'value')
+)
+def update_graph_2(selected_country):
+    filtered_df = expenses[expenses['country'] == selected_country]
+    filtered_income_df = df_income[df_income['country'] == selected_country]
+    fig = px.bar(
+        filtered_df,
+        x='date',
+        y='cost',
+        color='cost_type',
+        title=f'associeted costs and expected revenue for: {selected_country}',
+        labels={'Service': 'Valor del Servicio'},
+    )
+    fig.add_trace(go.Scatter(
+        x=filtered_income_df['date'],
+        y=filtered_income_df['expected_average_income'],
+        mode='lines',
+        name='daily_expected_income',
+        line=dict(color='green'),  # Personaliza el color de la línea
+    ))
+    return fig
+
+
+@app.callback(
+    Output('graph', 'figure'),
+    Input('country-filter', 'value')
+)
+def update_graph(selected_country):
+    filtered_df = income_expenses_balance[income_expenses_balance['country'] == selected_country]
+    fig = px.scatter(
+        filtered_df,
+        x='cost',
+        y='expected_average_income',
+        title=f'associeted costs and expected revenue for: {selected_country}'
+    ) 
+    
+    fig.update_traces(
+        text=filtered_df['labels'],
+        hovertemplate='<b>Date</b>: %{text}<br><b>Cost</b>: %{x}<br><b>Expected Avg Income</b>: %{y}',  # Posición y tamaño de las etiquetas
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=income_expenses_balance['cost'],  # Puedes ajustar estos valores según tu necesidad
+            y=1 * income_expenses_balance['cost'],  # Pendiente de 0.05
+            mode='lines',
+            name='y = x',  # Nombre de la recta en la leyenda
+            line=dict(color='black', dash='dash')  # Personalizar el estilo de la línea
+        )
+    )
+            
+    max_axis_val = max([filtered_df['cost'].max(),filtered_df['expected_average_income'].max()])*1.1
+    fig.update_xaxes(range=[0, max_axis_val]) #filtered_df['cost'].min()
+    fig.update_yaxes(range=[0, max_axis_val]) #filtered_df['expected_average_income'].min()
+    
+    return fig
+    
 # Ejecutar la aplicación
 if __name__ == '__main__':
     app.run_server(debug=True)
