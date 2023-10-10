@@ -198,7 +198,7 @@ app.layout = html.Div([
     html.Div([
         html.H1("balance"),
         dcc.Dropdown(
-            id='country-filter',
+            id='country-filter-for-balance',
             options=[{'label': country, 'value': country} for country in income_expenses_balance['country'].unique()],
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
@@ -329,7 +329,7 @@ def update_graph_2(selected_country):
 
 @app.callback(
     Output('graph', 'figure'),
-    Input('country-filter', 'value')
+    Input('country-filter-for-balance', 'value')
 )
 def update_graph(selected_country):
     filtered_df = income_expenses_balance[income_expenses_balance['country'] == selected_country]
