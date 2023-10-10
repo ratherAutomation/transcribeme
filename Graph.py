@@ -159,7 +159,9 @@ tabla_de_datos = dash_table.DataTable(
     fixed_rows={'headers': True},
     
     style_cell={'minWidth': 60, 'maxWidth': 100},
-    style_table={'height': '350px', 'overflowY': 'auto','padding-top': '50px'}  # Limitar la altura de la tabla y agregar scroll
+    style_table={'height': '350px', 'overflowY': 'auto','padding-top': '50px'},  # Limitar la altura de la tabla y agregar scroll
+    sort_action='native',  # Habilitar la capacidad de ordenar la tabla
+
 )
 
 tabla_de_income = dash_table.DataTable(
