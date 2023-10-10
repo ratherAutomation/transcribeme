@@ -75,6 +75,8 @@ ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().rese
 ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
 ratio_df['subscribers'].fillna(0, inplace=True)
 ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
+ratio_df['dau'] = ratio_df['dau'].round(1)
+ratio_df['subscribers'] = ratio_df['subscribers'].round(1)
     
 response_three = requests.get(url_csv_balance)
 if response_three.status_code == 200:
