@@ -15,7 +15,6 @@ import secrets
 from pymongo import MongoClient
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/ratio_df.csv'
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
@@ -72,11 +71,10 @@ dau_by_country_collection=db['dau-by-country']
 dau_by_country_from_mongo = dau_by_country_collection.find()
 dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 
-response_two = requests.get(url_csv_dau_sub)
-if response_two.status_code == 200:
-    ratio_df = pd.read_csv(StringIO(response_two.text))
-else:
-    print("No se pudo obtener el archivo CSV")
+ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(), subs_by_country_df.groupby('country')['user_id'].sum().reset_index(), on='country', how='left')
+ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
+ratio_df['subscribers'].fillna(0, inplace=True)
+ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
     
 response_three = requests.get(url_csv_balance)
 if response_three.status_code == 200:
@@ -106,10 +104,10 @@ def figura_grafico_dispersion():
     # ... Código para el segundo gráfico de dispersión (estático) ...
     fig = px.scatter(
         ratio_df,
-        x='average_dau',
-        y='total_subs',
+        x='dau',
+        y='subscribers',
         color='country',
-        labels={'dau': 'DAU', 'new_subscribers': 'New Subscribers'},
+        labels={'dau': 'DAU', 'subscribers': 'New Subscribers'},
         
     )
     fig.update_traces(showlegend=False)
@@ -118,8 +116,8 @@ def figura_grafico_dispersion():
     
 columnas_personalizadas = [
     {'name': 'Country', 'id': 'country'},
-    {'name': 'Average DAU', 'id': 'average_dau'},
-    {'name': 'Sub', 'id': 'total_subs'},
+    {'name': 'Average DAU', 'id': 'dau'},
+    {'name': 'Sub', 'id': 'subscribers'},
     {'name': 'Ratio', 'id': 'ratio'}
 ]
 tabla_de_datos = dash_table.DataTable(
@@ -261,7 +259,7 @@ def actualizar_grafico(pais_seleccionado):
     dau_df_filtered = dau_by_country_df[dau_by_country_df['country'] == pais_seleccionado]
     # Crear el gráfico de barras
     fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs by date in {pais_seleccionado}')
-    dau_by_country_fig=px.bar(dau_df_filtered,x='date',y='user_ids',title=f'DAU by date in {pais_seleccionado}')
+    dau_by_country_fig = px.bar(dau_df_filtered,x='date',y='user_ids',title=f'DAU by date in {pais_seleccionado}')
     
     # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
