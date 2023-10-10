@@ -151,7 +151,8 @@ app.layout = html.Div([
             value='Argentina',  # País seleccionado por defecto
             multi=False
         ),
-        dcc.Graph(id='grafico-nuevos-subscriptores')
+        dcc.Graph(id='grafico-nuevos-subscriptores'),
+        dcc.Graph(id='dau-by-country')
     ], style={'width': '100%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
 
     # División de dos columnas (para futuros gráficos)
@@ -159,8 +160,7 @@ app.layout = html.Div([
         # Columna izquierda (para el primer gráfico futuro)
         html.Div([
             html.H3('Avg DAU vs New Subs Ratio'),
-            dcc.Graph(id='grafico-dispersion', figure=figura_grafico_dispersion()),
-            dcc.Graph(id='dau-by-country',figure=dau_by_country_graph())
+            dcc.Graph(id='grafico-dispersion', figure=figura_grafico_dispersion())
         ], style={'width': '60%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
                 
         # Columna derecha (para el segundo gráfico futuro)
@@ -252,7 +252,7 @@ def update_graph(selected_country):
 # Definir la función de actualización del gráfico
 @app.callback(
     dash.dependencies.Output('grafico-nuevos-subscriptores', 'figure'),
-    dash.dependencies.Output('dau-by-country-graph','figure'),
+    dash.dependencies.Output('dau-by-country','figure'),
     [dash.dependencies.Input('filtro-pais', 'value')]
 )
 def actualizar_grafico(pais_seleccionado):
