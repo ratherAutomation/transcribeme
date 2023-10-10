@@ -101,48 +101,44 @@ opciones_paises = [{'label': country, 'value': country} for country in subs_by_c
 # Diseñar la interfaz de usuario de la aplicación
 
 def figura_grafico_dispersion():
-fig = px.scatter(
-    ratio_df,
-    x='dau',
-    y='subscribers',
-    color='country',
-    labels={'dau': 'Daily Active Users', 'subscribers': 'Total Subscribers'},
-    hover_data={'dau': ':.1f'}  # Formato con un decimal para la columna 'dau'
-)
-    
-
-# Filtrar los países cuyo valor de 'subscribers' esté por encima de 200
-paises_con_subscribers_altos = ratio_df[ratio_df['subscribers'] > 150]
-
-# Agregar etiquetas de texto para los países con 'subscribers' altos
-for i, row in paises_con_subscribers_altos.iterrows():
-    fig.add_trace(
-        go.Scatter(
-            x=[row['dau']],
-            y=[row['subscribers']],
-            text=[row['country']],
-            mode='text',
-            textfont=dict(color='black', size=10),
-            textposition='top left',  # Ubicación del texto (derecha y arriba)
-
-            showlegend=False
+    fig = px.scatter(
+        ratio_df,
+        x='dau',
+        y='subscribers',
+        color='country',
+        labels={'dau': 'Daily Active Users', 'subscribers': 'Total Subscribers'},
+        hover_data={'dau': ':.1f'}  # Formato con un decimal para la columna 'dau'
+    )  
+    # Filtrar los países cuyo valor de 'subscribers' esté por encima de 200
+    paises_con_subscribers_altos = ratio_df[ratio_df['subscribers'] > 150]
+    # Agregar etiquetas de texto para los países con 'subscribers' altos
+    for i, row in paises_con_subscribers_altos.iterrows():
+        fig.add_trace(
+            go.Scatter(
+                x=[row['dau']],
+                y=[row['subscribers']],
+                text=[row['country']],
+                mode='text',
+                textfont=dict(color='black', size=10),
+                textposition='top left',  # Ubicación del texto (derecha y arriba)    
+                showlegend=False
+            )
+        ) 
+        
+        fig.update_traces(showlegend=False)
+        fig.update_xaxes(type='log')
+        fig.update_layout(
+            xaxis=dict(
+                showline=True,  # Mostrar la línea del eje x
+                linecolor='black',  # Color de la línea del eje x (negro)
+                linewidth=1,  # Ancho de la línea del eje x (delgado)
+                showgrid=True,  # Mostrar líneas de cuadrícula en el eje x
+                gridcolor='lightgray',  # Color de las líneas de cuadrícula (gris claro)
+                gridwidth=0.5  # Ancho de las líneas de cuadrícula (fino)
+            ),
+            plot_bgcolor='white',  # Fondo del gráfico
+            paper_bgcolor='white'  # Fondo del papel (todo el gráfico)
         )
-    ) 
-    
-    fig.update_traces(showlegend=False)
-    fig.update_xaxes(type='log')
-    fig.update_layout(
-        xaxis=dict(
-            showline=True,  # Mostrar la línea del eje x
-            linecolor='black',  # Color de la línea del eje x (negro)
-            linewidth=1,  # Ancho de la línea del eje x (delgado)
-            showgrid=True,  # Mostrar líneas de cuadrícula en el eje x
-            gridcolor='lightgray',  # Color de las líneas de cuadrícula (gris claro)
-            gridwidth=0.5  # Ancho de las líneas de cuadrícula (fino)
-        ),
-        plot_bgcolor='white',  # Fondo del gráfico
-        paper_bgcolor='white'  # Fondo del papel (todo el gráfico)
-    )
 
     return fig
     
