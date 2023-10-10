@@ -104,7 +104,7 @@ server = app.server
 
 
 # Definir las opciones para el filtro desplegable de países
-opciones_paises = [{'label': country, 'value': country} for pais in subs_by_country_df['country'].unique()]
+opciones_paises = [{'label': country, 'value': country} for country in subs_by_country_df['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
 
