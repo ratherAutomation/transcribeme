@@ -1,16 +1,11 @@
 import dash
-from dash import dcc
-from dash import html
-from dash import Input
-from dash import Output
-from dash import dash_table
+from dash import dcc,html,Input,Output,dash_table
 import plotly.express as px
 import pandas as pd
 import requests
 import os
 from io import StringIO
 import plotly.graph_objects as go
-
 import secrets
 from pymongo import MongoClient
 
@@ -71,12 +66,12 @@ dau_by_country_collection=db['dau-by-country']
 dau_by_country_from_mongo = dau_by_country_collection.find()
 dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 
+#Calcula el ratio entre total de subscriptores y valor promedio de daily active users.
 ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(), subs_by_country_df.groupby('country')['user_id'].sum().reset_index(), on='country', how='left')
 ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
 ratio_df['subscribers'].fillna(0, inplace=True)
 ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
-ratio_df['dau'] = ratio_df['dau'].round(1)
-ratio_df['subscribers'] = ratio_df['subscribers'].round(1)
+ratio_df['dau'] = ratio_df.round(1)
     
 response_three = requests.get(url_csv_balance)
 if response_three.status_code == 200:
@@ -210,7 +205,7 @@ app.layout = html.Div([
         dcc.Graph(id='graph')
     ], style={'width': '100%', 'display': 'inline-block'}),
     html.Div([
-        html.H1("Gráfico de Datos por País"),
+        html.H1("Gráfico de gastos e ingreso por pais"),
         dcc.Dropdown(
             id='country-filter_2',
             options=[{'label': country, 'value': country} for country in expenses['country'].unique()],
@@ -285,13 +280,16 @@ def update_graph(selected_country):
     dash.dependencies.Output('dau-by-country','figure'),
     [dash.dependencies.Input('filtro-pais', 'value')]
 )
-def actualizar_grafico(pais_seleccionado):
+def actualizar_grafico(selected_country):
     # Filtrar los datos por el país seleccionado
-    df_filtrado = subs_by_country_df[subs_by_country_df['country'] == pais_seleccionado]
-    dau_df_filtered = dau_by_country_df[dau_by_country_df['country'] == pais_seleccionado]
-    # Crear el gráfico de barras
-    fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs by date in {pais_seleccionado}')
-    dau_by_country_fig = px.bar(dau_df_filtered,x='date',y='user_ids',title=f'DAU by date in {pais_seleccionado}')
+    df_filtrado = subs_by_country_df[subs_by_country_df['country'] == selected_country]
+    dau_df_filtered = dau_by_country_df[dau_by_country_df['country'] == selected_country]
+    # Crear gráficos de barras
+
+    color_barra = '#1da453'
+
+    fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs & daily active users by date in {selected_country}', color_discrete_sequence=[color_barra])
+    dau_by_country_fig = px.bar(dau_df_filtered,x='date',y='user_ids', color_discrete_sequence=[color_barra])
     
     # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
@@ -317,14 +315,24 @@ def actualizar_grafico(pais_seleccionado):
             ay=-30
         )
     )
-    
     # Personalizar el diseño del gráfico
     fig.update_layout(
         xaxis_title='Date',
         yaxis_title='New Subscribers',
-        showlegend=False  # Para ocultar la leyenda si no se necesita
+        showlegend=False,  # Para ocultar la leyenda si no se necesita
+        plot_bgcolor='white',  # Fondo blanco
+        paper_bgcolor='white',  # Fondo del papel (todo el gráfico)
+        xaxis=dict(
+            linecolor='black',  # Color de la línea del eje x (negro)
+            linewidth=1  # Ancho de la línea del eje x (delgado)
+        ),
+        yaxis=dict(
+            linecolor='black',  # Color de la línea del eje y (negro)
+            linewidth=1  # Ancho de la línea del eje y (delgado)
+        )
     )
-    
+
+    #dau by country figure
     dau_by_country_fig.add_shape(
         go.layout.Shape(
             type="line",
@@ -338,9 +346,18 @@ def actualizar_grafico(pais_seleccionado):
     dau_by_country_fig.update_layout(
         xaxis_title='Date',
         yaxis_title='DAU',
-        showlegend=False  # Para ocultar la leyenda si no se necesita
-    )
-
+        showlegend=False,  # Para ocultar la leyenda si no se necesita
+        plot_bgcolor='white',  # Fondo blanco
+        paper_bgcolor='white',  # Fondo del papel (todo el gráfico)
+        xaxis=dict(
+            linecolor='black',  # Color de la línea del eje x (negro)
+            linewidth=1  # Ancho de la línea del eje x (delgado)
+        ),
+        yaxis=dict(
+            linecolor='black',  # Color de la línea del eje y (negro)
+            linewidth=1  # Ancho de la línea del eje y (delgado)
+        )
+    )  
     
     return fig,dau_by_country_fig
 
