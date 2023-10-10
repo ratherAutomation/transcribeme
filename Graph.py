@@ -15,7 +15,6 @@ import secrets
 from pymongo import MongoClient
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_raw = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/recent_subs.csv'
 url_csv_dau_sub = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/ratio_df.csv'
 url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
@@ -68,15 +67,10 @@ subs_by_country_collection = db['subs-by-country']
 subs_by_country_from_mongo=subs_by_country_collection.find()
 subs_by_country_df = pd.DataFrame(subs_by_country_from_mongo)
 
-
-# Hacer una solicitud HTTP para obtener el contenido del archivo CSV
-response = requests.get(url_csv_raw)
-# Verificar si la solicitud fue exitosa
-if response.status_code == 200:
-    # Leer el contenido del archivo CSV en un DataFrame
-    recent_subs = pd.read_csv(StringIO(response.text))
-else:
-    print("No se pudo obtener el archivo CSV")
+#Dau by country 
+dau_by_country_collection=db['dau-by-country']
+dau_by_country_from_mongo = dau_by_country_collection.find()
+dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 
 response_two = requests.get(url_csv_dau_sub)
 if response_two.status_code == 200:
@@ -165,7 +159,8 @@ app.layout = html.Div([
         # Columna izquierda (para el primer gráfico futuro)
         html.Div([
             html.H3('Avg DAU vs New Subs Ratio'),
-            dcc.Graph(id='grafico-dispersion', figure=figura_grafico_dispersion())
+            dcc.Graph(id='grafico-dispersion', figure=figura_grafico_dispersion()),
+            dcc.Graph(id='dau-by-country',figure=dau_by_country_graph())
         ], style={'width': '60%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
                 
         # Columna derecha (para el segundo gráfico futuro)
@@ -257,14 +252,16 @@ def update_graph(selected_country):
 # Definir la función de actualización del gráfico
 @app.callback(
     dash.dependencies.Output('grafico-nuevos-subscriptores', 'figure'),
+    dash.dependencies.Output('dau-by-country-graph','figure'),
     [dash.dependencies.Input('filtro-pais', 'value')]
 )
 def actualizar_grafico(pais_seleccionado):
     # Filtrar los datos por el país seleccionado
     df_filtrado = subs_by_country_df[subs_by_country_df['country'] == pais_seleccionado]
-    
+    dau_df_filtered = dau_by_country_df[dau_by_country_df['country'] == pais_seleccionado]
     # Crear el gráfico de barras
     fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs by date in {pais_seleccionado}')
+    dau_by_country_fig=px.bar(dau_df_filtered,x='date',y='user_ids',title=f'DAU by date in {pais_seleccionado}')
     
     # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
@@ -298,7 +295,24 @@ def actualizar_grafico(pais_seleccionado):
         showlegend=False  # Para ocultar la leyenda si no se necesita
     )
     
-    return fig
+    dau_by_country_fig.add_shape(
+        go.layout.Shape(
+            type="line",
+            x0=fecha_cambio,
+            x1=fecha_cambio,  
+            y0=0,
+            y1=max(dau_df_filtered['user_ids']),
+            line=dict(color="grey", width=2, dash='dash'),
+        )
+    )    
+    dau_by_country_fig.update_layout(
+        xaxis_title='Date',
+        yaxis_title='DAU',
+        showlegend=False  # Para ocultar la leyenda si no se necesita
+    )
+
+    
+    return fig,dau_by_country_fig
 
 # Ejecutar la aplicación
 if __name__ == '__main__':
