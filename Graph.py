@@ -74,7 +74,14 @@ onlycost_grouped = expenses.groupby(['date','country'])['cost'].sum().reset_inde
 df_income['date']=df_income['date'].apply(lambda x : str(x)[:10])
 income_expenses_balance = pd.merge(onlycost_grouped, df_income, on=['country','date'], how='left')
 income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x : str(x)[5:10])
-    
+
+
+
+balance_by_country = income_expenses_balance.groupby('country').agg({
+    'cost': 'mean',
+    'expected_average_income': 'max'
+}).reset_index()
+
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
 server = app.server
@@ -184,14 +191,26 @@ app.layout = html.Div([
     ], style={'width': '100%', 'display': 'flex'}),  # Ajusta el ancho según tus necesidades
    
     html.Div([
-        html.H1("balance"),
+        html.H1("General balances"),
         dcc.Dropdown(
             id='country-filter-for-balance',
             options=[{'label': country, 'value': country} for country in income_expenses_balance['country'].unique()],
             value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
         ),
-        dcc.Graph(id='graph')
-    ], style={'width': '100%', 'display': 'inline-block'}),
+        html.Div([
+            # Columna izquierda (para el primer gráfico futuro)
+            html.Div([
+                html.H3('daily cost/daily expected income | from date 01/09'),
+                dcc.Graph(id='graph')
+            ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+            html.Div([
+                html.H3('average daily income vs expected daily income for all countries'),
+                dcc.Graph(id='graph-2')      
+            ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+        ], style={'width': '100%', 'display': 'inline-block'}),
+    ], style={'width': '100%', 'display': 'inline-block'}),   
+
+    
     html.Div([
         html.H1("Gráfico de gastos e ingreso por pais"),
         dcc.Dropdown(
@@ -336,28 +355,67 @@ def update_graph(selected_country):
         filtered_df,
         x='cost',
         y='expected_average_income',
-        title=f'associeted costs and expected revenue for: {selected_country}'
-    ) 
-    
+        title=f'Expenses and Expected Income for: {selected_country}'
+    )
+
     fig.update_traces(
         text=filtered_df['labels'],
         hovertemplate='<b>Date</b>: %{text}<br><b>Cost</b>: %{x}<br><b>Expected Avg Income</b>: %{y}',  # Posición y tamaño de las etiquetas
     )
     fig.add_trace(
         go.Scatter(
-            x=income_expenses_balance['cost'],  # Puedes ajustar estos valores según tu necesidad
-            y=1 * income_expenses_balance['cost'],  # Pendiente de 0.05
+            x=income_expenses_balance['cost'],
+            y=1 * income_expenses_balance['cost'],
             mode='lines',
-            name='y = x',  # Nombre de la recta en la leyenda
-            line=dict(color='black', dash='dash')  # Personalizar el estilo de la línea
+            name='y = x',
+            line=dict(color='black', dash='dash')
         )
     )
             
     max_axis_val = max([filtered_df['cost'].max(),filtered_df['expected_average_income'].max()])*1.1
-    fig.update_xaxes(range=[0, max_axis_val]) #filtered_df['cost'].min()
-    fig.update_yaxes(range=[0, max_axis_val]) #filtered_df['expected_average_income'].min()
-    
+    fig.update_xaxes(range=[0, max_axis_val])
+    fig.update_yaxes(range=[0, max_axis_val])
+
     return fig
+
+@app.callback(
+    Output('graph-2', 'figure'),
+    Input('country-filter-for-balance', 'value')
+)
+def update_balance_graph(selected_country):
+    fig = px.scatter(
+        balance_by_country,
+        x='cost',
+        y='expected_average_income',
+        title= 'Associeted costs and expected revenue all countries',
+        color='country',
+        labels={'cost': 'average daily cost', 'expected_average_income': 'current daily income'},
+    )
+    fig.update_traces(showlegend=False)
+
+    fig.update_layout(
+        xaxis=dict(
+            showline=True,  # Mostrar la línea del eje x
+            linecolor='black',  # Color de la línea del eje x (negro)
+            linewidth=1,  # Ancho de la línea del eje x (delgado)
+            showgrid=True,  # Mostrar líneas de cuadrícula en el eje x
+            gridcolor='lightgray',  # Color de las líneas de cuadrícula (gris claro)
+            gridwidth=0.5  # Ancho de las líneas de cuadrícula (fino)
+        ),
+            plot_bgcolor='white',  # Fondo del gráfico
+            paper_bgcolor='white'  # Fondo del papel (todo el gráfico)
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=balance_by_country['cost'],
+            y=1 * balance_by_country['cost'],
+            mode='lines',
+            name='x=y',
+            line=dict(color='black', dash='dash')
+        )
+    )    
+    return fig
+
     
 # Ejecutar la aplicación
 if __name__ == '__main__':
