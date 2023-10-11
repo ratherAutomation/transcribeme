@@ -9,9 +9,6 @@ import plotly.graph_objects as go
 import secrets
 from pymongo import MongoClient
 
-# URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
-
 secret_file_path = '/etc/secrets/user'
 
 # Verifica si el archivo existe
@@ -77,13 +74,6 @@ onlycost_grouped = expenses.groupby(['date','country'])['cost'].sum().reset_inde
 df_income['date']=df_income['date'].apply(lambda x : str(x)[:10])
 income_expenses_balance = pd.merge(onlycost_grouped, df_income, on=['country','date'], how='left')
 income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x : str(x)[5:10])
-
-response_allcost = requests.get(url_csv_balance)
-if response_allcost.status_code == 200:
-    # Leer el contenido del archivo CSV en un DataFrame
-    all_costs = pd.read_csv(StringIO(response_allcost.text))
-else:
-    print("No se pudo obtener el archivo CSV")
     
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
