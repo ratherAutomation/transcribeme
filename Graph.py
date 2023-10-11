@@ -10,7 +10,6 @@ import secrets
 from pymongo import MongoClient
 
 # URL cruda del archivo CSV en GitHub (reemplaza con la URL de tu archivo)
-url_csv_balance = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/income_expense_balance.csv'
 url_csv_all_costs = 'https://raw.githubusercontent.com/ratherAutomation/transcribeme/main/all_cost.csv'
 
 secret_file_path = '/etc/secrets/user'
@@ -72,13 +71,12 @@ ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
 ratio_df['subscribers'].fillna(0, inplace=True)
 ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
 ratio_df = ratio_df.round(1)
-    
-response_three = requests.get(url_csv_balance)
-if response_three.status_code == 200:
-    # Leer el contenido del archivo CSV en un DataFrame
-    income_expenses_balance = pd.read_csv(StringIO(response_three.text))
-else:
-    print("No se pudo obtener el archivo CSV")
+
+#genera el income_expenses_balance dataframe
+onlycost_grouped = expenses.groupby(['date','country'])['cost'].sum().reset_index()
+df_income['date']=df_income['date'].apply(lambda x : str(x)[:10])
+income_expenses_balance = pd.merge(onlycost_grouped, df_income, on=['country','date'], how='left')
+income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x : str(x)[5:10])
 
 response_allcost = requests.get(url_csv_balance)
 if response_allcost.status_code == 200:
@@ -309,11 +307,20 @@ def actualizar_grafico(selected_country):
 def update_graph_2(selected_country):
     filtered_df = expenses[expenses['country'] == selected_country]
     filtered_income_df = df_income[df_income['country'] == selected_country]
+    colors = {
+        'wpp_price': '#00a985',
+        'tkn_price': 'darkgray',
+        'whisper_price': '#51da48'
+        # Agrega más cost_type y colores si es necesario
+    }
+       
+    
     fig = px.bar(
         filtered_df,
         x='date',
         y='cost',
         color='cost_type',
+        color_discrete_map=colors,       
         title=f'associeted costs and expected revenue for: {selected_country}',
         labels={'Service': 'Valor del Servicio'},
     )
@@ -322,8 +329,10 @@ def update_graph_2(selected_country):
         y=filtered_income_df['expected_average_income'],
         mode='lines',
         name='daily_expected_income',
-        line=dict(color='green'),  # Personaliza el color de la línea
+        line=dict(color='black'),  # Personaliza el color de la línea
     ))
+    fig.update_layout(plot_bgcolor='white')
+    
     return fig
 
 
