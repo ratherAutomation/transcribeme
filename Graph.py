@@ -6,6 +6,8 @@ import requests
 import os
 from io import StringIO
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 import secrets
 from pymongo import MongoClient
 
