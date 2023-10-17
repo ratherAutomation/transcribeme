@@ -295,11 +295,11 @@ def actualizar_grafico(selected_country):
     #dau by country figure
 
     dau_by_country_fig.add_trace(
-        go.Bar(x=dau_df_filtered['date'],y=dau_df_filtered['user_ids'], name="user_ids"),
+        go.Bar(x=dau_df_filtered['date'],y=dau_df_filtered['user_ids'], name="dau"),
         secondary_y=False,
     )
     dau_by_country_fig.add_trace(
-        go.Scatter(x=filtered_new_users_by_country_df['date'], y=filtered_new_users_by_country_df['user_id'], name="user_id"),
+        go.Scatter(x=filtered_new_users_by_country_df['date'], y=filtered_new_users_by_country_df['user_id'], name="new users"),
         secondary_y=True,
     )
     
