@@ -64,7 +64,7 @@ dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 
 
 #New Users by country 
-new_users_by_country_collection=db['dau-by-country']
+new_users_by_country_collection=db['new-users-by-country']
 new_users_by_country_from_mongo = new_users_by_country_collection.find()
 new_users_by_country=pd.DataFrame(new_users_by_country_from_mongo)
 
