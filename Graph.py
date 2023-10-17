@@ -62,6 +62,13 @@ dau_by_country_collection=db['dau-by-country']
 dau_by_country_from_mongo = dau_by_country_collection.find()
 dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 
+
+#New Users by country 
+new_users_by_country_collection=db['dau-by-country']
+new_users_by_country_from_mongo = new_users_by_country_collection.find()
+new_users_by_country=pd.DataFrame(new_users_by_country_from_mongo)
+
+
 #Calcula el ratio entre total de subscriptores y valor promedio de daily active users.
 ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(), subs_by_country_df.groupby('country')['user_id'].sum().reset_index(), on='country', how='left')
 ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
@@ -231,12 +238,16 @@ def actualizar_grafico(selected_country):
     # Filtrar los datos por el país seleccionado
     df_filtrado = subs_by_country_df[subs_by_country_df['country'] == selected_country]
     dau_df_filtered = dau_by_country_df[dau_by_country_df['country'] == selected_country]
+    filtered_new_users_by_country_df = new_users_by_country[new_users_by_country['country'] == selected_country]
+
     # Crear gráficos de barras
 
     color_barra = '#1da453'
 
     fig = px.bar(df_filtrado, x='start_date', y='user_id', title=f'New subs & daily active users by date in {selected_country}', color_discrete_sequence=[color_barra])
-    dau_by_country_fig = px.bar(dau_df_filtered,x='date',y='user_ids', color_discrete_sequence=[color_barra])
+    dau_by_country_fig=make_subplots(specs=[[{"secondary_y": True}]])
+    
+    #dau_by_country_fig = px.bar(dau_df_filtered,x='date',y='user_ids', color_discrete_sequence=[color_barra])
     
     # Agregar una línea vertical discontinua en la fecha 2023-09-13 con un título
     fecha_cambio = '2023-09-13'
@@ -280,6 +291,16 @@ def actualizar_grafico(selected_country):
     )
 
     #dau by country figure
+
+    dau_by_country_fig.add_trace(
+        go.Bar(x=filtered_dau_by_country_df['date'],y=filtered_dau_by_country_df['user_ids'], name="user_ids"),
+        secondary_y=False,
+    )
+    dau_by_country_fig.add_trace(
+        go.Scatter(x=filtered_new_users_by_country_df['date'], y=filtered_new_users_by_country_df['user_id'], name="user_id"),
+        secondary_y=True,
+    )
+    
     dau_by_country_fig.add_shape(
         go.layout.Shape(
             type="line",
@@ -292,8 +313,8 @@ def actualizar_grafico(selected_country):
     )    
     dau_by_country_fig.update_layout(
         xaxis_title='Date',
-        yaxis_title='DAU',
-        showlegend=False,  # Para ocultar la leyenda si no se necesita
+        #yaxis_title='DAU',
+        #showlegend=False,  # Para ocultar la leyenda si no se necesita
         plot_bgcolor='white',  # Fondo blanco
         paper_bgcolor='white',  # Fondo del papel (todo el gráfico)
         xaxis=dict(
@@ -304,7 +325,9 @@ def actualizar_grafico(selected_country):
             linecolor='black',  # Color de la línea del eje y (negro)
             linewidth=1  # Ancho de la línea del eje y (delgado)
         )
-    )  
+    )
+    dau_by_country_fig.update_yaxes(title_text="<b>dau</b>", secondary_y=False)
+    dau_by_country_fig.update_yaxes(title_text="<b>new users</b>", secondary_y=True)
     return fig,dau_by_country_fig
 
 
