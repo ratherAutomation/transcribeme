@@ -124,13 +124,13 @@ def alltime_new_users():
     )  
     return fig
 def alltime_subs():
-    subs_by_date = subs_by_country_df.groupby('date')['user_id'].sum().reset_index()
+    subs_by_date = subs_by_country_df.groupby('start_date')['user_id'].sum().reset_index()
     
     fig = px.bar(
         subs_by_date,
-        x='date',
+        x='start_date',
         y='user_id',
-        labels={'user_id': 'Subs By Date', 'date': 'Date'},
+        labels={'user_id': 'Subs By Date', 'start_date': 'Date'},
         hover_data={'user_id': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
     return fig
