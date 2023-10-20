@@ -100,6 +100,30 @@ server = app.server
 country_optioins = [{'label': country, 'value': country} for country in subs_by_country_df['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
+def alltime_dau():
+    dau_by_date = dau_by_country_df.groupby('date')['user_ids'].sum().reset_index()
+    
+    fig = px.scatter(
+        dau_by_date,
+        x='date',
+        y='user_ids',
+        labels={'user_ids': 'Daily Active Users', 'date': 'Date'},
+        hover_data={'user_ids': ':.0f'}  # Formato con un decimal para la columna 'dau'
+    )
+    return fig 
+    
+def alltime_new_users():
+    new_users_by_date = new_users_by_country.groupby('date')['user_id'].sum().reset_index()
+    
+    fig = px.scatter(
+        new_users_by_date,
+        x='date',
+        y='user_id',
+        labels={'user_id': 'New Users', 'date': 'Date'},
+        hover_data={'user_id': ':.0f'}  # Formato con un decimal para la columna 'dau'
+    )  
+    return fig
+
 
 def figura_grafico_dispersion():
     fig = px.scatter(
@@ -172,7 +196,24 @@ tabla_de_income = dash_table.DataTable(
 )
 
 app.layout = html.Div([
-    # División principal con dos partes: gráfico central y división de dos columnas
+#All time
+    html.Div([
+        # Columna izquierda (para el primer gráfico futuro)
+        html.Div([
+            html.H3('DAU By Date'),
+            dcc.Graph(id='all-time-dau-average', figure=alltime_dau())
+        ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+                
+        # Columna derecha (para el segundo gráfico futuro)
+        html.Div([
+            html.H3('New Users By Date'),
+            dcc.Graph(id='all-time-new-users', figure=alltime_new_users())
+
+        ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+    ], style={'width': '100%', 'display': 'flex'}),  # Ajusta el ancho según tus necesidades    
+    
+    
+    
     html.Div([# Gráfico central (puedes personalizar esto)
         dcc.Dropdown(
             id='country-filter',
