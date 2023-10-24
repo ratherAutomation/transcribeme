@@ -69,7 +69,7 @@ dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
 new_users_by_country_collection=db['new-users-by-country']
 new_users_by_country_from_mongo = new_users_by_country_collection.find()
 new_users_by_country=pd.DataFrame(new_users_by_country_from_mongo)
-
+new_users_by_country =new_users_by_country.sort_values(by='date' , ascending=True)
 
 #Calcula el ratio entre total de subscriptores y valor promedio de daily active users.
 ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(), subs_by_country_df.groupby('country')['user_id'].sum().reset_index(), on='country', how='left')
