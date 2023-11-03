@@ -297,7 +297,7 @@ app.layout = html.Div([
             value=expenses['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph3')
-    ], style={'width': '100%', 'display': 'inline-block'})
+    ], style={'width': '100%', 'display': 'inline-block'}),
     html.Div([
         html.H1("Expected Income (Aproximacion)"),
         dcc.Graph(id='all_income', figure=all_income_graph())
