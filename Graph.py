@@ -135,6 +135,18 @@ def alltime_subs():
     )
     return fig
 
+
+def all_income_graph():
+    all_income = df_income.groupby('date')['expected_average_income'].sum().reset_index()    
+    fig = px.bar(
+        all_income,
+        x='date',
+        y='expected_average_income',
+        labels={'expected_average_income': 'Expected Income', 'date': 'Date'},
+        hover_data={'expected_average_income': ':.0f'}  # Formato con un decimal para la columna 'dau'
+    )
+    return fig
+
 def figura_grafico_dispersion():
     fig = px.scatter(
         ratio_df,
@@ -285,6 +297,10 @@ app.layout = html.Div([
             value=expenses['country'].unique()[0]  # Valor predeterminado
         ),
         dcc.Graph(id='graph3')
+    ], style={'width': '100%', 'display': 'inline-block'})
+    html.Div([
+        html.H1("Expected Income (Aproximacion)"),
+        dcc.Graph(id='all_income', figure=all_income_graph())
     ], style={'width': '100%', 'display': 'inline-block'})
 ])   
 
