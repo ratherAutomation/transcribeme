@@ -2,6 +2,7 @@ import dash
 from dash import dcc,html,Input,Output,dash_table
 import plotly.express as px
 import pandas as pd
+import numpy as np
 import requests
 from datetime import datetime
 from datetime import date
