@@ -1,5 +1,7 @@
 dash ==2.6.0
 pandas
+numpy
+datetime
 gunicorn
 requests
 pymongo
