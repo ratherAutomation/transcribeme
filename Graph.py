@@ -83,6 +83,7 @@ ratio_df = ratio_df.round(1)
 
 #genera el income_expenses_balance dataframe
 onlycost_grouped = expenses.groupby(['date','country'])['cost'].sum().reset_index()
+onlycost_grouped['date'] = onlycost_grouped['date'].apply(lambda x : str(x)[:10])
 df_income['date']=df_income['date'].apply(lambda x : str(x)[:10])
 income_expenses_balance = pd.merge(onlycost_grouped, df_income, on=['country','date'], how='left')
 income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x : str(x)[5:10])
