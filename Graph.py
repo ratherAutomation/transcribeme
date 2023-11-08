@@ -145,7 +145,7 @@ def all_income_graph():
     collection = db['Income']
     data_from_mongodb = collection.find()
     df_income = pd.DataFrame(data_from_mongodb)    
-    df_income['date'] = pd.to_datetime(df_income['date'])
+    df_income['date'] = df_income['date']apply(lambda x: pd.to_datetime(x))
     df_income['week'] = df_income['date'].apply(lambda x : x.isocalendar().week)
     income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
@@ -162,7 +162,7 @@ def all_expenses_graph():
     expenses_collection = db['Expenses']
     expenses_data_from_mongo = expenses_collection.find()
     expenses = pd.DataFrame(expenses_data_from_mongo)
-    expenses['date'] = pd.to_datetime(expenses['date'])
+    expenses['date'] = expenses['date'].apply(lambda x: pd.to_datetime(x))
     expenses['week'] = expenses['date'].apply(lambda x : x.isocalendar().week)
     expenses_by_week_country = expenses.groupby(['week','country'])['cost'].sum().reset_index()
     fig = px.bar(
