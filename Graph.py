@@ -3,6 +3,8 @@ from dash import dcc,html,Input,Output,dash_table
 import plotly.express as px
 import pandas as pd
 import requests
+from datetime import datetime
+from datetime import date
 import os
 from io import StringIO
 import plotly.graph_objects as go
@@ -141,7 +143,7 @@ def all_income_graph():
     df_income['week'] = df_income['date'].apply(lambda x : x.isocalendar().week)
     income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
-        income_by_week_country,
+        income_by_week_country[(income_by_week_country['week']>35)&(income_by_week_country['week']<45)],
         x='date',
         y='expected_average_income',
         color='country',
@@ -155,7 +157,7 @@ def all_expenses_graph():
     expenses['week'] = expenses['date'].apply(lambda x : x.isocalendar().week)
     expenses_by_week_country = expenses.groupby(['week','country'])['cost'].sum().reset_index()
     fig = px.bar(
-        expenses_by_week_country,
+        expenses_by_week_country[expenses_by_week_country['week']>35],
         x='date',
         y='cost',
         color='country',
