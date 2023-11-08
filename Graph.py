@@ -137,13 +137,30 @@ def alltime_subs():
 
 
 def all_income_graph():
-    all_income = df_income.groupby('date')['expected_average_income'].sum().reset_index()    
+    df_income['date'] = pd.to_datetime(df_income['date'])
+    df_income['week'] = df_income['date'].apply(lambda x : x.isocalendar().week)
+    income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
-        all_income,
+        income_by_week_country,
         x='date',
         y='expected_average_income',
+        color='country',
         labels={'expected_average_income': 'Expected Income', 'date': 'Date'},
         hover_data={'expected_average_income': ':.0f'}  # Formato con un decimal para la columna 'dau'
+    )
+    return fig
+    
+def all_expenses_graph():
+    expenses['date'] = pd.to_datetime(expenses['date'])
+    expenses['week'] = expenses['date'].apply(lambda x : x.isocalendar().week)
+    expenses_by_week_country = expenses.groupby(['week','country'])['cost'].sum().reset_index()
+    fig = px.bar(
+        expenses_by_week_country,
+        x='date',
+        y='cost',
+        color='country',
+        labels={'cost': 'Costs', 'date': 'Date'},
+        hover_data={'cost': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
     return fig
 
@@ -298,10 +315,22 @@ app.layout = html.Div([
         ),
         dcc.Graph(id='graph3')
     ], style={'width': '100%', 'display': 'inline-block'}),
+    
     html.Div([
-        html.H1("Expected Income (Aproximacion)"),
-        dcc.Graph(id='all_income', figure=all_income_graph())
-    ], style={'width': '100%', 'display': 'inline-block'})
+        html.H1("Incomes and Expenses"),
+        html.Div([
+            # Columna izquierda (para el primer gráfico futuro)
+            html.Div([
+                html.H3('Expenses'),
+                dcc.Graph(id='expenses_general',figure=all_expenses_graph())
+            ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+            html.Div([
+                html.H3('Income'),
+                dcc.Graph(id='income_general',figure=all_income_graph())      
+            ], style={'width': '50%', 'display': 'inline-block'}),  # Ajusta el ancho según tus necesidades
+        ], style={'width': '100%', 'display': 'inline-block'}),
+    ], style={'width': '100%', 'display': 'inline-block'}),   
+
 ])   
 
 @app.callback(
