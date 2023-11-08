@@ -145,10 +145,10 @@ def all_income_graph():
     income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
         income_by_week_country[(income_by_week_country['week']>35)&(income_by_week_country['week']<45)],
-        x='date',
+        x='week',
         y='expected_average_income',
         color='country',
-        labels={'expected_average_income': 'Expected Income', 'date': 'Date'},
+        labels={'expected_average_income': 'Expected Income', 'week': 'Week'},
         hover_data={'expected_average_income': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
     return fig
@@ -157,10 +157,10 @@ def all_expenses_graph():
     expenses_by_week_country = expenses.groupby(['week','country'])['cost'].sum().reset_index()
     fig = px.bar(
         expenses_by_week_country[expenses_by_week_country['week']>35],
-        x='date',
+        x='week',
         y='cost',
         color='country',
-        labels={'cost': 'Costs', 'date': 'Date'},
+        labels={'cost': 'Costs', 'week': 'Week'},
         hover_data={'cost': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
     return fig
