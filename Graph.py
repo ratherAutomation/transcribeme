@@ -145,7 +145,7 @@ def all_income_graph():
     collection = db['Income']
     data_from_mongodb = collection.find()
     df_income = pd.DataFrame(data_from_mongodb)    
-    df_income['date'] = df_income['date']apply(lambda x: pd.to_datetime(x))
+    df_income['date'] = df_income['date'].apply(lambda x: pd.to_datetime(x))
     df_income['week'] = df_income['date'].apply(lambda x : x.isocalendar().week)
     income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
