@@ -142,7 +142,7 @@ def alltime_subs():
 
 def all_income_graph():
 
-    income_by_week_country = income_df.groupby(['week','country'])['expected_average_income'].sum().reset_index()
+    income_by_week_country = df_income.groupby(['week','country'])['expected_average_income'].sum().reset_index()
     fig = px.bar(
         income_by_week_country[(income_by_week_country['week']>35)&(income_by_week_country['week']<45)],
         x='week',
