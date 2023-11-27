@@ -103,7 +103,7 @@ server = app.server
 
 
 # Definir las opciones para el filtro desplegable de países
-country_optioins = [{'label': country, 'value': country} for country in alltime_new_users['country'].unique()]
+country_optioins = [{'label': country, 'value': country} for country in new_users_by_country['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
 def alltime_dau():
