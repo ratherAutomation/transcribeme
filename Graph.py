@@ -47,53 +47,55 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
-db = client['TranscribeMe-charts']  # Reemplaza 'nombre_de_tu_base_de_datos' con el nombre de tu base de datos
-collection = db['Income']
-data_from_mongodb = collection.find()
-df_income = pd.DataFrame(data_from_mongodb)
-df_income = df_income.sort_values(by='date',ascending=True)
 
-expenses_collection = db['Expenses']
-expenses_data_from_mongo = expenses_collection.find()
-expenses = pd.DataFrame(expenses_data_from_mongo)
+# Conectarse a la base de datos
+db = client['TranscribeMe-charts']
 
-#subs by country
-subs_by_country_collection = db['subs-by-country']
-subs_by_country_from_mongo=subs_by_country_collection.find()
-subs_by_country_df = pd.DataFrame(subs_by_country_from_mongo)
+# Obtener datos de la colección 'Income'
+df_income = pd.DataFrame(list(db['Income'].find())).sort_values(by='date', ascending=True)
 
-#Dau by country 
-dau_by_country_collection=db['dau-by-country']
-dau_by_country_from_mongo = dau_by_country_collection.find()
-dau_by_country_df=pd.DataFrame(dau_by_country_from_mongo)
+# Obtener datos de la colección 'Expenses'
+expenses = pd.DataFrame(list(db['Expenses'].find()))
 
+# Obtener datos de la colección 'subs-by-country'
+subs_by_country_df = pd.DataFrame(list(db['subs-by-country'].find()))
 
-#New Users by country 
-new_users_by_country_collection=db['new-users-by-country']
-new_users_by_country_from_mongo = new_users_by_country_collection.find()
-new_users_by_country=pd.DataFrame(new_users_by_country_from_mongo)
-new_users_by_country =new_users_by_country.sort_values(by='date' , ascending=True)
+# Obtener datos de la colección 'dau-by-country'
+dau_by_country_df = pd.DataFrame(list(db['dau-by-country'].find()))
 
-#Calcula el ratio entre total de subscriptores y valor promedio de daily active users.
-ratio_df = pd.merge(dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(), subs_by_country_df.groupby('country')['user_id'].sum().reset_index(), on='country', how='left')
-ratio_df=ratio_df.rename(columns={'user_ids':'dau','user_id':'subscribers'})
+# Obtener datos de la colección 'new-users-by-country'
+new_users_by_country = pd.DataFrame(list(db['new-users-by-country'].find())).sort_values(by='date', ascending=True)
+
+# Calcular el ratio entre total de subscriptores y valor promedio de daily active users
+ratio_df = pd.merge(
+    dau_by_country_df.groupby('country')['user_ids'].mean().reset_index(),
+    subs_by_country_df.groupby('country')['user_id'].sum().reset_index(),
+    on='country',
+    how='left'
+)
+ratio_df = ratio_df.rename(columns={'user_ids': 'dau', 'user_id': 'subscribers'})
 ratio_df['subscribers'].fillna(0, inplace=True)
-ratio_df['ratio'] = ratio_df['subscribers']/ratio_df['dau']
+ratio_df['ratio'] = ratio_df['subscribers'] / ratio_df['dau']
 ratio_df = ratio_df.round(1)
 
-#genera el income_expenses_balance dataframe
-onlycost_grouped = expenses.groupby(['date','country'])['cost'].sum().reset_index()
-onlycost_grouped['date'] = onlycost_grouped['date'].apply(lambda x : str(x)[:10])
-df_income['date']=df_income['date'].apply(lambda x : str(x)[:10])
-income_expenses_balance = pd.merge(onlycost_grouped, df_income, on=['country','date'], how='left')
-income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x : str(x)[5:10])
+# Generar el DataFrame income_expenses_balance
+onlycost_grouped = expenses.groupby(['date', 'country'])['cost'].sum().reset_index()
+onlycost_grouped['date'] = onlycost_grouped['date'].apply(lambda x: str(x)[:10])
+df_income['date'] = df_income['date'].apply(lambda x: str(x)[:10])
+income_expenses_balance = pd.merge(
+    onlycost_grouped,
+    df_income,
+    on=['country', 'date'],
+    how='left'
+)
+income_expenses_balance['labels'] = income_expenses_balance['date'].apply(lambda x: str(x)[5:10])
 
-
-
+# Calcular el balance por país
 balance_by_country = income_expenses_balance.groupby('country').agg({
     'cost': 'mean',
     'expected_average_income': 'max'
 }).reset_index()
+
 
 # Crear una aplicación Dash
 app = dash.Dash(__name__)
@@ -134,7 +136,7 @@ def alltime_new_users():
     
     return fig
 def alltime_subs():
-    subs_by_date = subs_by_country_df.groupby(['date','country'])['user_id'].sum().reset_index()
+    subs_by_date = subs_by_country_df.groupby(['start_date','country'])['user_id'].sum().reset_index()
     
     fig = px.bar(
         subs_by_date,
