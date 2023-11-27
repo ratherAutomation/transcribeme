@@ -105,38 +105,47 @@ country_optioins = [{'label': country, 'value': country} for country in subs_by_
 
 # Diseñar la interfaz de usuario de la aplicación
 def alltime_dau():
-    dau_by_date = dau_by_country_df.groupby('date')['user_ids'].sum().reset_index()
+    dau_by_date = dau_by_country_df.groupby(['date','country'])['user_ids'].sum().reset_index()
     
     fig = px.bar(
         dau_by_date,
         x='date',
         y='user_ids',
+        color='country',
         labels={'user_ids': 'Daily Active Users', 'date': 'Date'},
         hover_data={'user_ids': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
+    fig.update_layout(showlegend=False)
+
     return fig 
     
 def alltime_new_users():
-    new_users_by_date = new_users_by_country.groupby('date')['user_id'].sum().reset_index()
+    new_users_by_date = new_users_by_country.groupby(['date','country'])['user_id'].sum().reset_index()
     
     fig = px.bar(
         new_users_by_date,
         x='date',
         y='user_id',
+        color='country',
         labels={'user_id': 'New Users', 'date': 'Date'},
         hover_data={'user_id': ':.0f'}  # Formato con un decimal para la columna 'dau'
-    )  
+    )
+    fig.update_layout(showlegend=False)
+    
     return fig
 def alltime_subs():
-    subs_by_date = subs_by_country_df.groupby('start_date')['user_id'].sum().reset_index()
+    subs_by_date = subs_by_country_df.groupby(['date','country'])['user_id'].sum().reset_index()
     
     fig = px.bar(
         subs_by_date,
         x='start_date',
         y='user_id',
+        color='country',
         labels={'user_id': 'Subs By Date', 'start_date': 'Date'},
         hover_data={'user_id': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
+    fig.update_layout(showlegend=False)
+    
     return fig
 
 
