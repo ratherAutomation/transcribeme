@@ -103,7 +103,7 @@ server = app.server
 
 
 # Definir las opciones para el filtro desplegable de países
-country_optioins = [{'label': country, 'value': country} for country in subs_by_country_df['country'].unique()]
+country_optioins = [{'label': country, 'value': country} for country in alltime_new_users['country'].unique()]
 
 # Diseñar la interfaz de usuario de la aplicación
 def alltime_dau():
@@ -299,11 +299,6 @@ app.layout = html.Div([
    
     html.Div([
         html.H1("General balances"),
-        dcc.Dropdown(
-            id='country-filter-for-balance',
-            options=[{'label': country, 'value': country} for country in income_expenses_balance['country'].unique()],
-            value=income_expenses_balance['country'].unique()[0]  # Valor predeterminado
-        ),
         html.Div([
             # Columna izquierda (para el primer gráfico futuro)
             html.Div([
@@ -320,11 +315,6 @@ app.layout = html.Div([
     
     html.Div([
         html.H1("Gráfico de gastos e ingreso por pais"),
-        dcc.Dropdown(
-            id='country-filter_2',
-            options=[{'label': country, 'value': country} for country in expenses['country'].unique()],
-            value=expenses['country'].unique()[0]  # Valor predeterminado
-        ),
         dcc.Graph(id='graph3')
     ], style={'width': '100%', 'display': 'inline-block'}),
     
@@ -450,7 +440,7 @@ def actualizar_grafico(selected_country):
 
 @app.callback(
     Output('graph3', 'figure'),
-    Input('country-filter_2', 'value')
+    Input('country-filter', 'value')
 )
 def update_graph_2(selected_country):
     filtered_df = expenses[expenses['country'] == selected_country]
@@ -486,7 +476,7 @@ def update_graph_2(selected_country):
 
 @app.callback(
     Output('graph', 'figure'),
-    Input('country-filter-for-balance', 'value')
+    Input('country-filter', 'value')
 )
 def update_graph(selected_country):
     filtered_df = income_expenses_balance[income_expenses_balance['country'] == selected_country]
@@ -519,7 +509,7 @@ def update_graph(selected_country):
 
 @app.callback(
     Output('graph-2', 'figure'),
-    Input('country-filter-for-balance', 'value')
+    Input('country-filter', 'value')
 )
 def update_balance_graph(selected_country):
     fig = px.scatter(
