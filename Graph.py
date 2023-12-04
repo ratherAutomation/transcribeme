@@ -159,10 +159,11 @@ def all_income_graph():
         x='week',
         y='expected_average_income',
         color='country',
-        showlegend=False,
         labels={'expected_average_income': 'Expected Income', 'week': 'Week'},
         hover_data={'expected_average_income': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
+    fig.update_layout(showlegend=False)
+
     return fig
     
 def all_expenses_graph():
@@ -172,10 +173,11 @@ def all_expenses_graph():
         x='week',
         y='cost',
         color='country',
-        showlegend=False,
         labels={'cost': 'Costs', 'week': 'Week'},
         hover_data={'cost': ':.0f'}  # Formato con un decimal para la columna 'dau'
     )
+    fig.update_layout(showlegend=False)  
+    
     return fig
 
 def figura_grafico_dispersion():
